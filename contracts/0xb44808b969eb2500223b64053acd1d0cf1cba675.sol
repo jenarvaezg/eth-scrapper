@@ -1,0 +1,64 @@
+
+//Address: 0xb44808b969eb2500223b64053acd1d0cf1cba675
+//Contract name: Countdown
+//Balance: 0 Ether
+//Verification Date: 1/25/2018
+//Transacion Count: 35
+
+// CODE STARTS HERE
+
+pragma solidity ^0.4.18;
+
+// See thecryptobutton.com
+contract Countdown {
+    
+    uint public deadline;
+    address owner;
+    address public winner;
+    uint public reward = 0;
+    uint public tips = 0;
+    uint public buttonClicks = 0;
+    
+    function Countdown() public payable {
+        owner = msg.sender;
+        deadline = now + 3 hours;
+        winner = msg.sender;
+        reward += msg.value;
+    }
+    
+    function ClickButton() public payable {
+        // Pay at least 1 dollar to click the button
+        require(msg.value >= 0.001 ether);
+        
+        // Refund people who click the button
+        // after it expires
+        if (now > deadline) {
+            revert();
+        }
+    
+        reward += msg.value * 8 / 10;
+        // Take 20% tip for server costs.
+        tips += msg.value * 2 / 10;
+        winner = msg.sender;
+        deadline = now + 30 minutes;
+        buttonClicks += 1;
+    }
+    
+    // The winner is responsible for withdrawing the funds
+    // after the button expires
+    function Win() public {
+        require(msg.sender == winner);
+        require(now > deadline);
+        uint pendingReward = reward;
+        reward = 0;
+        winner.transfer(pendingReward);
+    }
+    
+    function withdrawTips() public {
+        // The owner can only withdraw the tips
+        uint pendingTips = tips;
+        tips = 0;
+        owner.transfer(pendingTips);
+    }
+    
+}

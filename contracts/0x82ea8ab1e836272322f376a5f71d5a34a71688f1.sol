@@ -1,0 +1,47 @@
+
+//Address: 0x82ea8ab1e836272322f376a5f71d5a34a71688f1
+//Contract name: Fortune
+//Balance: 0 Ether
+//Verification Date: 3/30/2018
+//Transacion Count: 7
+
+// CODE STARTS HERE
+
+/*
+ * DO NOT EDIT! DO NOT EDIT! DO NOT EDIT!
+ *
+ * This is an automatically generated file. It will be overwritten.
+ *
+ * For the original source see
+ *    '/Users/swaldman/Dropbox/BaseFolders/development-why/gitproj/eth-fortune/src/main/solidity/Fortune.sol'
+ */
+
+pragma solidity ^0.4.10;
+
+contract Fortune {
+  string[] public fortunes; // automatically generates an indexed getter (only)
+
+  function Fortune( string initialFortune ) public {
+    addFortune( initialFortune );
+  }
+
+  function addFortune( string fortune ) public {
+    fortunes.push( fortune );
+
+    FortuneAdded( msg.sender, fortune );
+  }
+
+  function drawFortune() public view returns ( string fortune ) {
+    fortune = fortunes[ shittyRandom() % fortunes.length ];
+  }
+
+  function countFortunes() public view returns ( uint count ) {
+    count = fortunes.length;	   
+  }
+
+  function shittyRandom() private view returns ( uint number ) {
+    number = uint( block.blockhash( block.number - 1 ) );  	   
+  }
+
+  event FortuneAdded( address author, string fortune );	
+}

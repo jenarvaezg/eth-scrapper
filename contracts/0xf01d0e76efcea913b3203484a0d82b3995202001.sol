@@ -1,0 +1,50 @@
+
+//Address: 0xf01d0e76efcea913b3203484a0d82b3995202001
+//Contract name: GiftCard2017
+//Balance: 0.45 Ether
+//Verification Date: 11/21/2017
+//Transacion Count: 24
+
+// CODE STARTS HERE
+
+pragma solidity ^0.4.18;
+// Version 2
+
+contract GiftCard2017{
+    address owner;
+    mapping (address => uint256) public authorizations;
+    
+    /// Constructor sets owner.
+    function GiftCard2017() public {
+        owner = msg.sender;
+    }
+    
+    /// Redeems authorized ETH.
+    function () public payable {                               // Accept ether only because some clients require it.
+        uint256 _redemption = authorizations[msg.sender];      // Amount mEth available to redeem.
+        require (_redemption > 0);
+        authorizations[msg.sender] = 0;                        // Clear authorization.
+        msg.sender.transfer(_redemption * 1e15 + msg.value);   // convert mEth to wei for transfer()
+    }
+    
+    /// Contract owner deposits ETH.
+    function deposit() public payable OwnerOnly {
+    }
+    
+    /// Contract owner withdraws ETH.
+    function withdraw(uint256 _amount) public OwnerOnly {
+        owner.transfer(_amount);
+    }
+
+    /// Contract owner authorizes redemptions in units of 1/1000 ETH.    
+    function authorize(address _addr, uint256 _amount_mEth) public OwnerOnly {
+        require (this.balance >= _amount_mEth);
+        authorizations[_addr] = _amount_mEth;
+    }
+    
+    /// Check that message came from the contract owner.
+    modifier OwnerOnly () {
+        require (msg.sender == owner);
+        _;
+    }
+}
